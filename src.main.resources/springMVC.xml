@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:jee="http://www.springframework.org/schema/jee" xmlns:tx="http://www.springframework.org/schema/tx" xmlns:p="http://www.springframework.org/schema/p" xmlns:aop="http://www.springframework.org/schema/aop" xmlns:context="http://www.springframework.org/schema/context"  xmlns:mvc="http://www.springframework.org/schema/mvc"  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.1.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.1.xsd http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.1.xsd http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.1.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.1.xsd ">
+	<description>SpringMVC配置文件 </description>
+	
+	<!-- 开启srping mvc注入配置 -->
+	<mvc:annotation-driven/>
+<!-- 	<aop:aspectj-autoproxy proxy-target-class="true" /> -->
+
+	<!-- 开启aspctj aop组件，开启后，可以利用@Aspect注解对类进行面向切面的编程 -->
+	<aop:aspectj-autoproxy />
+	
+	<!-- 静态资源访问（不拦截此目录下的东西的访问） -->  
+    <mvc:resources location="res/"  mapping="/res/**" />    
+    <!-- 对action层进行自动注入扫描 -->
+	<context:component-scan base-package="com.lezhi.demo.ifc.*" />
+ 	<bean class="com.lezhi.demo.ifc.common.LogAspect" />
+
+	<!-- 配置MessageModel对象的生命首期为request级别，且各请求Session互相隔离，以便在Action、Service层中做统一的消息组件，要使用时，注入即可 -->
+	<bean class="com.lezhi.demo.ifc.common.MessageModel" scope="request">
+		<!-- 如果scope采用request或session时，以下aop标记是必须的，否则会报错无法注入 -->
+		<aop:scoped-proxy/> 
+	</bean>
+	<bean class="com.fasterxml.jackson.databind.ObjectMapper" />
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/WEB-INF/content/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+	<!-- 配置Spring MVC用于接收上传文件等数据的组件 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver" p:defaultEncoding="utf-8" />
+</beans>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <Property name="log.base" value="/Users/gaoxiang/Downloads/demo/ifc" />
+	<!-- 全局日志以控制台输出 -->
+	<!-- 此输出只应用于开发环境，生产环境务必注释掉，打开文件记录方式 -->
+	  <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder>
+			<pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{5} - %msg%n
+			</pattern>
+		</encoder>
+	</appender> 
+
+	<!-- Action拦截器使用的以类名与方法名以文件夹分别记录日志的记录器 -->
+	<!-- 此记录器主要用于Action拦截器进行统一日志记录的方式 -->
+	<appender name="SIFT" class="ch.qos.logback.classic.sift.SiftingAppender">
+		<discriminator>
+			<key>ActionMethod</key>
+			<defaultValue>unknown</defaultValue>
+		</discriminator>
+		<sift>
+			<appender name="FILE-${ActionMethod}"
+				class="ch.qos.logback.core.rolling.RollingFileAppender">
+				<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+					<fileNamePattern>${log.base}/${ActionMethod}/log-%d{yyyy-MM-dd}.log
+					</fileNamePattern>
+					<maxHistory>30</maxHistory>
+				</rollingPolicy>
+				<encoder>
+					<pattern>%d{HH:mm:ss.SSS}
+						[%thread] %-5level %logger{5} - %msg%n
+					</pattern>
+				</encoder>
+			</appender>
+		</sift>
+	</appender> 
+
+	<!-- 主记录器，开发环境请使用Debug，生产环境使用ERROR -->
+	<root level="Debug">
+		<!-- <appender-ref ref="SIFT" /> -->
+		<appender-ref ref="STDOUT" />
+	</root>
+
+	<!-- 将所有action的日志以文件夹的方式分别记录，只记录info级别以上的，而且日志不在主日志文件内记录 -->
+    <logger name="com.lezhi.demo.ifc" level="Info" additivity="false"> 
+		<appender-ref ref="SIFT" /> 
+		<appender-ref ref="STDOUT" /> 
+	</logger> 
+
+	<!-- 将一些无关紧要的日志排除不进行记录，有利于日志的分析 -->
+	<!-- name值可以是包名或具体的类名：该包（包括子包）下的类或该类将采用此logger -->
+	<logger name="org.springframework" level="ERROR"></logger>
+
+</configuration>  
